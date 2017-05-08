@@ -1,0 +1,3 @@
+ln -s $1/vizmod-chain-hash chain-hash 
+ln -s $1/vizmod-peer-count peer-count
+ln -s $1/vizmod-chain-height chain-height
