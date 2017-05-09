@@ -22,6 +22,7 @@ import (
 	"math/big"
 	"math/rand"
 	"runtime"
+	"strconv"
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -125,6 +126,7 @@ func (ethash *Ethash) mine(block *types.Block, id int, seed uint64, abort chan s
 			if (attempts % (1 << 15)) == 0 {
 				ethash.hashrate.Mark(attempts)
 				attempts = 0
+				common.StateFlush("nonce-tried", strconv.FormatUint(nonce, 16)) 
 			}
 			// Compute the PoW value of this nonce
 			digest, result := hashimotoFull(dataset, hash, nonce)
@@ -133,6 +135,7 @@ func (ethash *Ethash) mine(block *types.Block, id int, seed uint64, abort chan s
 				header = types.CopyHeader(header)
 				header.Nonce = types.EncodeNonce(nonce)
 				header.MixDigest = common.BytesToHash(digest)
+				common.StateFlush("nonce-found", strconv.FormatUint(nonce, 16)) 
 
 				// Seal and return a block (if still needed)
 				select {

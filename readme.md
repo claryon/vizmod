@@ -29,8 +29,14 @@ A minimal web server written in Go. It allows for visualization to run anywhere:
 
 ### Visualization web page
 
-This page is dynamically created by Javascript and continually updated, usually every second. Three values are displayed that symbolize the state of a node in big, colored, single letters. These are the three different values that are observed:
+This page is dynamically created by Javascript and continually updated, usually every second. Three values are displayed that symbolize the state of a node in big, colored, single letters. These are the nine different values that are observed:
 
+* Last Transaction Broadcast
+* Last Transaction Received
+* Current Work: Nonce Tried
+* Proof of Work: Nonce Found
+* Proof Accepted: Verified Nonce
+* Last Proposed Block
 * Current Root Hash
 * Current Number of Peers
 * Current Chain Height
@@ -53,7 +59,7 @@ Prerequisite: Go and github installed.
 
 Install, build and run a modded geth from source using https://github.com/claryon/vizmod.
 
-	$ git clone …  
+	$ git clone https://github.com/claryon/vizmod  
 	$ cd vizmod/vizmod-geth  
 	$ make  
 	$ build/bin/geth  
@@ -64,9 +70,13 @@ To speed things up you might be able to copy or link a data directory from anoth
 
 This modded geth has extra logging that is needed for the visualization. In a different console, go to the vizmod-geth folder and check for files it writes to its current directory that start on `vizmod-`.
 
-Check that `vizmod-chain-hash` is logged as expected, e.g. catting it to screen repeatedly. Or using
+Check general activity
 
-	$ watch cat vizmod-chain-hash
+	$ tail -f vizmod-full.log
+
+Check that `vizmod-chain-hash.flush` is logged as expected, e.g. catting it to screen repeatedly. Or using
+
+	$ watch cat vizmod-chain-hash.flush
 
 With vizmod-geth running it should show a hash change every 5 to 20 seconds.
 
@@ -88,7 +98,7 @@ Check the server gives you a page when browsing `localhost:3000/`
 Check the softlinks in vizmod-server/docroot. They need to point to the flush files in vizmod-geth’s root. They do not share the exact same name but the links only use a middle part E.g.:
 
 	$ ls chain-hash
-	$ chain-hash --> ../../vizmod-geth/vizmod-chain-hash
+	$ chain-hash --> ../../vizmod-geth/vizmod-chain-hash.flush
 
 Check that the link vizmod-server/docroot/chain-hash works, e.g. catting it to screen repeatedly. Or using
 
@@ -98,14 +108,20 @@ With vizmod-geth running it should show a hash change every 5 to 20 seconds.
 
 If this is not the case, create the links in the vizmod-server’s docroot, e.g.:
 
-	$ ln -s ../../vizmod-geth/vizmod-chain-hash chain-hash
+	$ ln -s ../../vizmod-geth/vizmod-chain-hash.flush chain-hash
 
 You might use the `link` batch for this with the path as parameter:
 
 	$ ./link ../../vizmod-geth
 
-Otherwise, there are three of them to take care of:
+Otherwise, there are nine of them to take care of:
 
+* `tx-broadcast`
+* `tx-received`
+* `nonce-tried`
+* `nonce-found`
+* `nonce-accepted`
+* `proposed-block`
 * `chain-hash`
 * `peer-count`
 * `chain-height`
@@ -120,6 +136,8 @@ You should now see the instrumentation visualization as expected.
 For a private network, each node should get vizmod installed as above. There is no need to install normal, unmodded Ethereum clients, vizmod-geth only adds logging it does not have anything less.
 
 For example, for a private test network on five Raspberry Pis, install vizmod-geth on each. Set a private network number on start up for all of them.
+
+There are cross compiled binaries for Raspbian Pi 2's (ARM 7) in `bin/`.
 
 The visualization can be displayed by any browser that is pointed to the IP of the respective Pi, port 3000. E.g. Displays can be connected to the Pis t hemselves, each displaying a browser pointing to `http://localhost:3000/`. Or five laptops that are on the same local or wifi network can display the data of one Raspberry Pi each. E.g. http://192.168.1.11:3000/ or whatever the IP of any one Pi might be. The connection delay should be in the milliseconds, lower than the actual polling frequency delay of about a second.
 
@@ -236,16 +254,17 @@ Stability
 
 Successful, hands-off 48 hour test run on Ethereum mainnet, including entering and emerging from system hybernation.
 
+Note, the vizmod-* .log files might run a system out of space when run a very long time. Make them links to /dev/null if that is ever intended. They only serve for debugging and are not needed for operation. The vizmod-* .flush files are and they don’t use up disk space. 
+
 
 Safety
 -----
 
-THIS SETUP IS FOR DEMONSTRATION PURPOSES ONLY AND IS NOT HARDENED. IT IS NOT MADE FOR NODES USED IN A PUBLIC NETWORK. THE WEB SERVER MAY EXPOSE THE ENTIRE NODE.
-
+THIS SETUP IS FOR DEMONSTRATION PURPOSES ONLY AND IS NOT HARDENED. IT IS NOT MADE FOR NODES USED IN A PUBLIC NETWORK. THE WEB SERVER MAY EXPOSE THE ENTIRE NODE. THE MINING POWER OF THE MODIFIED CLIENT MAY BE DEGRADED. LOGS MAY WEIGH ON IO THROUGHPUT AND FILL UP THE NODES HARD DISK.
 
 License
 -------
 
-(c) 2017 Henning Diedrich, Claryon UG (haftungsbeschränkt).  
-All rights reserved.   
-To be commercially exploited or open-sourced by the European Commission.
+(c) 2017 Henning Diedrich, Claryon UG (haftungsbeschränkt).   
+geth (c) Ethereum Foundation.  
+To be open-sourced by the European Commission.  

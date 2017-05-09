@@ -231,10 +231,10 @@ func (self *BlockChain) loadLastState() error {
 	log.Info("Loaded most recent local fast block", "number", self.currentFastBlock.Number(), "hash", self.currentFastBlock.Hash(), "td", fastTd)
 
 	// note: geth starts and pulled this from its database
-	common.StateFlush("current-header-hash", currentHeader.Hash().Hex())
-	common.StateFlush("current-header-number", currentHeader.Number.String())
-	common.StateFlush("current-block-hash", self.currentBlock.Hash().Hex())
-	common.StateFlush("current-block-number", self.currentBlock.Number().String())
+	common.StateFlush("header-hash", currentHeader.Hash().Hex())
+	common.StateFlush("header-height", currentHeader.Number.String())
+	common.StateFlush("chain-hash", self.currentBlock.Hash().Hex())
+	common.StateFlush("chain-height", self.currentBlock.Number().String())
 
 	return nil
 }

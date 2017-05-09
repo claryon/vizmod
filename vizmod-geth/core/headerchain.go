@@ -282,7 +282,6 @@ func (hc *HeaderChain) InsertHeaderChain(chain []*types.Header, writeHeader WhCa
 	log.Info("Imported new block headers", "count", stats.processed, "elapsed", common.PrettyDuration(time.Since(start)),
 		"number", last.Number, "hash", last.Hash(), "ignored", stats.ignored)
 
-	common.ScreenWrite("last hash: " + last.Hash().Hex())
 	common.StateFlush("last-hash", last.Hash().Hex())
 
 	return 0, nil

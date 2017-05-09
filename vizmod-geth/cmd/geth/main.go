@@ -168,9 +168,6 @@ func init() {
 }
 
 func main() {
-	common.ScreenWrite("start")
-	common.ScreenWrite("check for file test.flush")
-	common.StateFlush("test.flush", "test")
 	if err := app.Run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -181,7 +178,19 @@ func main() {
 // It creates a default node based on the command line arguments and runs it in
 // blocking mode, waiting for it to be shut down.
 func geth(ctx *cli.Context) error {
-        fmt.Fprintf(ctx.App.Writer, "starting %v version %v\n", ctx.App.Name, ctx.App.Version)
+        fmt.Fprintf(ctx.App.Writer, "starting vizmod of %v version %v\n", ctx.App.Name, ctx.App.Version)
+	common.StateFlush("start", "vizmod start based on " + ctx.App.Version)
+	// create flush files or delete values of prior run
+	common.StateFlush("tx-broadcast", "-")
+	common.StateFlush("tx-received", "-")
+	common.StateFlush("nonce-tried", "-")
+	common.StateFlush("nonce-found", "-")
+	common.StateFlush("nonce-accepted", "-")
+	common.StateFlush("proposed-block", "-")
+	common.StateFlush("chain-hash", "-")
+	common.StateFlush("peer-count", "-")
+	common.StateFlush("chain-height", "-")
+
 	node := makeFullNode(ctx)
 	startNode(ctx, node)
 	node.Wait()

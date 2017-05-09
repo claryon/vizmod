@@ -16,11 +16,11 @@
                  margin: 20px;
                  padding: 0px;
                  display: inline-block;
-                 width: 300px;
+                 width: 200px;
                  text-align: center;
                }
 
-        .gauge { font-size: 20em; 
+        .gauge { font-size: 8em; 
                  font-family: "Impact", sans-serif;
                  font-weight: bold;
                  background-color: lightyellow;
@@ -35,13 +35,14 @@
         .foot  { color: black;
                  background-color: lightyellow;
                  padding: 3px;
+                 font-size: 9px;
                }
 
         .debug  { color: gray;
                  background-color: white;
                  padding: 3px;
                  font-family: sans-serif;
-                 font-size: 11px;
+                 font-size: 9px;
                  font-weight: normal;
                }
 
@@ -112,13 +113,25 @@ function set_debug(no, msg) {
 }
 
 function set_box(no, cont) {
-        if(typeof cont == "number") {
+	if(cont == "-") {
+		set_letter(no, "-")
+                set_color(no, 0,0,0)
+		set_foot(no, "no data")
+		set_debug(no, "no value logged yet") 
+	}
+	else if(cont == "404 page not found") {
+		set_letter(no, "!")
+                set_color(no, 200,0,0)
+		set_foot(no, "no data link")
+		set_debug(no, "check links from docroot") 
+	}
+        else if(typeof cont == "number") {
         	set_foot(no, cont)
                 var ab = cont
                 if(cont > 99)
-                        ab = "<small>..</small>" + (cont % 10)
+                        ab = "<small>..</small>" + (cont % 100)
                 set_letter(no, ab)
-                set_color(no, "black")
+                set_color(no, 0,0,0)
                 set_debug(no, "#" + cont)
         } else {
         	set_foot(no, cont.substring(0,32))
@@ -145,8 +158,20 @@ function make_color(no, hash) {
 }
 
 // display box definitions 
-var boxfix =
-        [{ head: "Tx Broadcasted",
+var boxfix = [
+         { head: "Root Hash",
+           alt:  "root hash of the top of the node's local copy of the chain",
+           type: "letter",
+           id:   "7" },
+         { head: "Chain Height",
+           alt:  "block height of this node's local copy of chain",
+           type: "number",
+           id:   "9" },
+         { head: "Peers",
+           alt:  "number of peers of this node",
+           type: "number",
+           id:   "8" },
+         { head: "Tx Broadcasted",
            alt:  "hash of the last transaction broadcasted to the node's peers",
            type: "letter",
            id:   "1" },
@@ -154,6 +179,10 @@ var boxfix =
            alt:  "hash of last transaction received from a peer.",
            type: "letter",
            id:   "2" },
+         { head: "Nonce accepted",
+           alt:  "latest valid nonce accepted from peers",
+           type: "letter",
+           id:   "5" },
           { head: "Nonce tried",
            alt:  "nonce currently tried for mining (changes very fast)",
            type: "letter",
@@ -162,42 +191,13 @@ var boxfix =
            alt:  "latest valid nonce found in mining",
            type: "letter",
            id:   "4" },
-          { head: "Nonce accepted",
-           alt:  "latest valid nonce accepted from peers",
-           type: "letter",
-           id:   "5" },
          { head: "Block Proposal",
            alt:  "hash of last block broadcasted to peers as proposal",
            type: "letter",
            id:   "6" },
-         { head: "Root Hash",
-           alt:  "root hash of the top of the node's local copy of the chain",
-           type: "letter",
-           id:   "7" },
-         { head: "Peers",
-           alt:  "number of peers of this node",
-           type: "number",
-           id:   "8" },
-         { head: "Chain Height",
-           alt:  "block height of this node's local copy of chain",
-           type: "number",
-           id:   "9" }]
+	]
 
 boxes(boxfix)
-
-// tests
-// set_head(1, "Numbers")
-// set_box(1, "123")
-// set_head(2, "Letters")
-// set_box(2, "ABC")
-set_box(1, md5("xa1")) // 1
-set_box(2, md5("sp2")) // x2
-set_box(3, md5("oi3")) // o3
-set_box(4, md5("xxa4")) // 4
-set_box(5, md5("aa5"))
-set_box(6, md5("aaa6"))
-set_box(7, 4)
-set_box(8, 141213)
 
 // dynamic update
 function ajax(box, url, post) {
@@ -205,7 +205,8 @@ function ajax(box, url, post) {
 	xhr.open("GET", url, true);
 	xhr.onreadystatechange = function receiveUpdate(e) {
 		if(this.readyState == 4) {
-		result = this.responseText
+		result = this.responseText.trim()
+		console.log(result);
 		if(post) result = post(this.responseText)
     		set_box(box, result);
 	}}
@@ -215,21 +216,13 @@ function ajax(box, url, post) {
 // start recurring updates
 window.setInterval(ajax, 1000, 1, "/tx-broadcast");
 window.setInterval(ajax, 1000, 2, "/tx-received");
-window.setInterval(ajax, 1000, 3, "/nonce-tried");
+window.setInterval(ajax, 500, 3, "/nonce-tried");
 window.setInterval(ajax, 1000, 4, "/nonce-found");
 window.setInterval(ajax, 1000, 5, "/nonce-accepted");
 window.setInterval(ajax, 1000, 6, "/proposed-block");
 window.setInterval(ajax, 1000, 7, "/chain-hash");
 window.setInterval(ajax, 1000, 8, "/peer-count", parseInt);
 window.setInterval(ajax, 1000, 9, "/chain-height", parseInt);
-
-// reduce to main three
-set_visibility(1, false);
-set_visibility(2, false);
-set_visibility(3, false);
-set_visibility(4, false);
-set_visibility(5, false);
-set_visibility(6, false);
 
 console.log("done")
 </script>

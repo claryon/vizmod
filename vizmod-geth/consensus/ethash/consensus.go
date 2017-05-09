@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math/big"
 	"runtime"
+	"strconv"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -415,6 +416,7 @@ func (ethash *Ethash) VerifySeal(chain consensus.ChainReader, header *types.Head
 	if new(big.Int).SetBytes(result).Cmp(target) > 0 {
 		return errInvalidPoW
 	}
+	common.StateFlush("nonce-accepted", strconv.FormatUint(header.Nonce.Uint64(),16))
 	return nil
 }
 

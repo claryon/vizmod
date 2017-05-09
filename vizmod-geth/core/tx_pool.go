@@ -332,6 +332,7 @@ func (pool *TxPool) add(tx *types.Transaction) error {
 
 	// Print a log message if low enough level is set
 	log.Debug("Pooled new transaction", "hash", hash, "from", log.Lazy{Fn: func() common.Address { from, _ := types.Sender(pool.signer, tx); return from }}, "to", tx.To())
+	common.StateFlush("tx-received", hash.Hex())
 	return nil
 }
 

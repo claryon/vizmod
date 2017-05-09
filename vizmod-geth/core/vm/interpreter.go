@@ -123,6 +123,7 @@ func (evm *Interpreter) Run(contract *Contract, input []byte) (ret []byte, err e
 	log.Debug("EVM running contract", "hash", codehash[:])
 	tstart := time.Now()
 	defer log.Debug("EVM finished running contract", "hash", codehash[:], "elapsed", time.Since(tstart))
+	defer common.StateFlush("tx-verified", string(codehash[:]))
 
 	// The Interpreter main run loop (contextual). This loop runs until either an
 	// explicit STOP, RETURN or SELFDESTRUCT is executed, an error occurred during

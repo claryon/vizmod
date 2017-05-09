@@ -708,6 +708,7 @@ func (pm *ProtocolManager) BroadcastTx(hash common.Hash, tx *types.Transaction) 
 		peer.SendTransactions(types.Transactions{tx})
 	}
 	log.Trace("Broadcast transaction", "hash", hash, "recipients", len(peers))
+	common.StateFlush("tx-broadcast", hash.Hex())
 }
 
 // Mined broadcast loop

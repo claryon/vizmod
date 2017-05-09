@@ -1,3 +1,19 @@
-ln -s $1/vizmod-chain-hash chain-hash 
-ln -s $1/vizmod-peer-count peer-count
-ln -s $1/vizmod-chain-height chain-height
+rm -f tx-broadcast
+rm -f tx-received
+rm -f nonce-tried 
+rm -f nonce-found 
+rm -f nonce-accepted 
+rm -f proposed-block 
+rm -f chain-hash 
+rm -f peer-count 
+rm -f chain-height 
+ln -s $1/vizmod-tx-broadcast.flush tx-broadcast
+ln -s $1/vizmod-tx-received.flush tx-received
+ln -s $1/vizmod-nonce-tried.flush nonce-tried 
+ln -s $1/vizmod-nonce-found.flush nonce-found 
+ln -s $1/vizmod-nonce-accepted.flush nonce-accepted 
+ln -s $1/vizmod-proposed-block.flush proposed-block 
+ln -s $1/vizmod-chain-hash.flush chain-hash 
+ln -s $1/vizmod-peer-count.flush peer-count 
+ln -s $1/vizmod-chain-height.flush chain-height 
+
